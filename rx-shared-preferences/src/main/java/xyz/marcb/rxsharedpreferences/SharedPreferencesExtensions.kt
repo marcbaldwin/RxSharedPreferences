@@ -8,10 +8,10 @@ fun SharedPreferences.string(key: String, defaultValue: String): Preference<Stri
         { value -> putString(key, value) }
     )
 
-fun SharedPreferences.optionalString(key: String, defaultValue: String? = null): Preference<String?> =
+fun SharedPreferences.optionalString(key: String, defaultValue: String? = null): Preference<Optional<String>> =
     RxSharedPreference(this, key,
-        { if (contains(key)) getString(key, defaultValue) else defaultValue },
-        { value -> if (value != null) putString(key, value) else remove(key) }
+        { Optional(if (contains(key)) getString(key, defaultValue) else defaultValue) },
+        { (value) -> putString(key, value) }
     )
 
 fun SharedPreferences.boolean(key: String, defaultValue: Boolean = false): Preference<Boolean> =
@@ -20,10 +20,10 @@ fun SharedPreferences.boolean(key: String, defaultValue: Boolean = false): Prefe
         { value -> putBoolean(key, value) }
     )
 
-fun SharedPreferences.optionalInt(key: String, defaultValue: Int? = null): Preference<Int?> =
+fun SharedPreferences.optionalInt(key: String, defaultValue: Int? = null): Preference<Optional<Int>> =
     RxSharedPreference(this, key,
-        { if (contains(key)) getInt(key, 0) else defaultValue },
-        { value -> if (value != null) putInt(key, value) else remove(key) }
+        { Optional(if (contains(key)) getInt(key, 0) else defaultValue) },
+        { (value) -> if (value != null) putInt(key, value) else remove(key) }
     )
 
 fun SharedPreferences.float(key: String, defaultValue: Float = 0f): Preference<Float> =
@@ -38,8 +38,8 @@ fun <T : Enum<T>> SharedPreferences.enum(key: String, defaultValue: T, converter
         { value -> edit { putString(key, value.name) } }
     )
 
-fun <T> SharedPreferences.custom(key: String, serializer: (T) -> String, deserializer: (String) -> T): Preference<T?> =
+fun <T> SharedPreferences.`object`(key: String, defaultValue: T, serializer: (T) -> String, deserializer: (String) -> T): Preference<T> =
     RxSharedPreference(this, key,
-        { if (contains(key)) deserializer(getString(key, null)!!) else null },
-        { value -> if (value != null) putString(key, serializer(value)) else remove(key) }
+        { if (contains(key)) deserializer(getString(key, null)!!) else defaultValue },
+        { value -> putString(key, serializer(value)) }
     )

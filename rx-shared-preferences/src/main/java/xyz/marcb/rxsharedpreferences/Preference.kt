@@ -1,6 +1,6 @@
 package xyz.marcb.rxsharedpreferences
 
-import rx.Observable
+import io.reactivex.Observable
 
 interface Preference<T> {
 

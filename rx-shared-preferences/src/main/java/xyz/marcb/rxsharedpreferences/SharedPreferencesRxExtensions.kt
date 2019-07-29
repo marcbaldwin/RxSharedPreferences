@@ -1,25 +1,25 @@
 package xyz.marcb.rxsharedpreferences
 
 import android.content.SharedPreferences
-import rx.Observable
+import io.reactivex.Observable
 
-// Emits key
+//
+// Emits the key when there is a change to the preference
+//
 fun SharedPreferences.observe(key: String): Observable<String> =
-    Observable.create(
-        { subscriber ->
-            val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
-                if (key == changedKey) {
-                    subscriber.onNext(changedKey)
-                }
+    Observable.create { subscriber ->
+
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
+            if (key == changedKey) {
+                subscriber.onNext(changedKey)
             }
+        }
 
-            registerOnSharedPreferenceChangeListener(listener)
+        registerOnSharedPreferenceChangeListener(listener)
 
-            subscriber.setCancellation {
-                unregisterOnSharedPreferenceChangeListener(listener)
-            }
+        subscriber.setCancellable {
+            unregisterOnSharedPreferenceChangeListener(listener)
+        }
 
-            subscriber.onNext(key)
-        },
-        rx.Emitter.BackpressureMode.NONE
-    )
+        subscriber.onNext(key)
+    }

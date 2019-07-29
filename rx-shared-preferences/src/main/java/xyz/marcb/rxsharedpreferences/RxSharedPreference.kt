@@ -1,7 +1,7 @@
 package xyz.marcb.rxsharedpreferences
 
 import android.content.SharedPreferences
-import rx.Observable
+import io.reactivex.Observable
 
 open class RxSharedPreference<T>(
     private val sharedPreferences: SharedPreferences,
